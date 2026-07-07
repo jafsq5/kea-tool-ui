@@ -1,19 +1,18 @@
 package config
 
 import (
+	"encoding/json"
 	"os"
-
-	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
 	Server struct {
-		Listen string `yaml:"listen"`
-	} `yaml:"server"`
+		Listen string `json:"listen"`
+	} `json:"server"`
 
 	Kea struct {
-		URL string `yaml:"url"`
-	} `yaml:"kea"`
+		URL string `json:"url"`
+	} `json:"kea"`
 }
 
 func Load(path string) (*Config, error) {
@@ -25,7 +24,10 @@ func Load(path string) (*Config, error) {
 
 	cfg := new(Config)
 
-	err = yaml.Unmarshal(data, cfg)
+	err = json.Unmarshal(data, cfg)
+	if err != nil {
+		return nil, err
+	}
 
-	return cfg, err
+	return cfg, nil
 }
