@@ -5,26 +5,25 @@ import (
 	"net/http"
 )
 
-func Render(w http.ResponseWriter, name string, data any) error {
+func Render(w http.ResponseWriter, page string, data any) error {
 
-	tpl, err := template.ParseFS(
-		Files,
+	tmpl, err := template.ParseFiles(
 		"templates/layout.html",
-		"templates/"+name,
+		"templates/"+page,
 	)
 
 	if err != nil {
 		return err
 	}
 
-	return tpl.ExecuteTemplate(w, "layout", data)
+	return tmpl.ExecuteTemplate(w, "layout", data)
 }
 
 func Static() http.Handler {
 
 	return http.StripPrefix(
 		"/static/",
-		http.FileServer(http.FS(Files)),
+		http.FileServer(http.Dir("./static")),
 	)
 
 }

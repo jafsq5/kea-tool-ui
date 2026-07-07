@@ -1,0 +1,11 @@
+services:
+  kea-ui:
+    build: .
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - ./configs/config.json:/config/config.json:ro
+
+    restart: unless-stopped

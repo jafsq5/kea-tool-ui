@@ -11,9 +11,10 @@ import (
 )
 
 func main() {
-	cfg, err := config.Load("configs/config.yaml")
+	cfg, err := config.Load("/config/config.json")
 	if err != nil {
-		panic(err)
+		logger.Error("cannot load config", "error", err)
+		os.Exit(1)
 	}
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
