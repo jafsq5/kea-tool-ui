@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/your-org/kea-ui/internal/web"
+	"github.com/jafsq5/kea-tool-ui/internal/web"
 )
 
 func Index() http.HandlerFunc {
