@@ -1,36 +1,46 @@
 package main
 
 import (
-	"log/slog"
-	"net/http"
-	"os"
-
-	"github.com/your-org/kea-ui/internal/config"
-	"github.com/your-org/kea-ui/internal/handler"
-	"github.com/your-org/kea-ui/internal/web"
+    "log/slog"
+    "net/http"
+    "os"
+    "github.com/jafsq5/kea-tool-ui/internal/config"
+    "github.com/jafsq5/kea-tool-ui/internal/handler"
+    "github.com/jafsq5/kea-tool-ui/internal/web"
 )
 
 func main() {
-	cfg, err := config.Load("/config/config.json")
-	if err != nil {
-		logger.Error("cannot load config", "error", err)
-		os.Exit(1)
-	}
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+    logger := slog.New(
+        slog.NewJSONHandler(os.Stdout, nil),
+    )
 
-	mux := http.NewServeMux()
+    cfg, err := config.Load("/configs/config.json")
+    if err != nil {
+        logger.Error("cannot load config", "error", err)
+        os.Exit(1)
+    }
 
-	mux.Handle("/static/", web.Static())
+    mux := http.NewServeMux()
 
-	mux.HandleFunc("/", handler.Index())
+    mux.Handle("/static/",
+        http.StripPrefix(
+            "/static/",
+            http.FileServer(http.Dir("./web/static")),
+        ),
+    )
 
-	logger.Info("server started", "listen", cfg.Server.Listen)
+    mux.HandleFunc("/", handler.Index())
 
-	err = http.ListenAndServe(cfg.Server.Listen, logging(logger, mux))
-	if err != nil {
-		logger.Error(err.Error())
-	}
+    logger.Info("starting server",
+        "listen", cfg.Server.Listen,
+    )
+
+    err = http.ListenAndServe(cfg.Server.Listen, mux)
+    if err != nil {
+        logger.Error(err.Error())
+        os.Exit(1)
+    }
 }
 
 func logging(log *slog.Logger, next http.Handler) http.Handler {
@@ -46,6 +56,5 @@ func logging(log *slog.Logger, next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 
-	})
-
+	}
 }
