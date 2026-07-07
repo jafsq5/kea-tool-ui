@@ -1,9 +1,25 @@
 {{define "content"}}
 
-<h2>Kea DHCP UI</h2>
+<div class="container">
+    <h1>Kea DHCP Reservation Manager</h1>
 
-<hr />
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>MAC</th>
+            <th>Hostname</th>
+            <th>IP</th>
+        </tr>
 
-<p>Server is running.</p>
+        {{range .Reservations}}
+
+        <tr>
+            <td>{{.MAC}}</td>
+            <td>{{.Hostname}}</td>
+            <td>{{.IP}}</td>
+        </tr>
+
+        {{end}}
+    </table>
+</div>
 
 {{end}}
