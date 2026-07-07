@@ -1,11 +1,13 @@
 services:
   kea-ui:
     build: .
-
-    ports:
-      - "8080:8080"
+    environment:
+      CONFIG_FILE: /config/config.json
 
     volumes:
       - ./configs/config.json:/config/config.json:ro
+
+    ports:
+      - "8080:8080"
 
     restart: unless-stopped

@@ -14,7 +14,13 @@ func main() {
         slog.NewJSONHandler(os.Stdout, nil),
     )
 
-    cfg, err := config.Load("/configs/config.json")
+    //Add support env CONFIG_FILE
+    configPath := os.Getenv("CONFIG_FILE")
+    if configPath == "" {
+        configPath = "configs/config.json"
+    }
+
+    cfg, err := config.Load(configPath)
     if err != nil {
         logger.Error("cannot load config", "error", err)
         os.Exit(1)
@@ -22,12 +28,7 @@ func main() {
 
     mux := http.NewServeMux()
 
-    mux.Handle("/static/",
-        http.StripPrefix(
-            "/static/",
-            http.FileServer(http.Dir("./web/static")),
-        ),
-    )
+    mux.Handle("/static/", web.Static())
 
     mux.HandleFunc("/", handler.Index())
 
