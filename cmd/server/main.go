@@ -6,6 +6,7 @@ import (
     "os"
     "github.com/jafsq5/kea-tool-ui/internal/config"
     "github.com/jafsq5/kea-tool-ui/internal/handler"
+    "github.com/jafsq5/kea-tool-ui/internal/web"
 )
 
 func main() {
