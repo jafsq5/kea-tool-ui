@@ -3,26 +3,38 @@ package handler
 import (
 	"net/http"
 
-	"github.com/jafsq5/kea-tool-ui/internal/service"
+	"github.com/jafsq5/kea-tool-ui/internal/hosts"
 	"github.com/jafsq5/kea-tool-ui/internal/web"
 )
 
-type IndexPage struct {
-	Reservations any
+type Handler struct {
+	service *hosts.Service
 }
 
-func Index() http.HandlerFunc {
+func New(service *hosts.Service) *Handler {
+	return &Handler{
+		service: service,
+	}
+}
 
-	svc := service.NewReservationService()
+type IndexPage struct {
+	Hosts []hosts.Host
+}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
 
-		page := IndexPage{
-			Reservations: svc.List(),
-		}
+	list, err := h.service.List()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-		if err := web.Render(w, "index.html", page); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+	page := IndexPage{
+		Hosts: list,
+	}
+
+	err = web.Render(w, "index.html", page)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

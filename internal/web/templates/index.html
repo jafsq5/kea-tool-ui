@@ -10,7 +10,19 @@
             <th>IP</th>
         </tr>
 
-        {{range .Reservations}}
+        {{range .Hosts}}
+
+        <tr>
+            <td>{{.Hostname}}</td>
+
+            <td>{{.HWAddress}}</td>
+
+            <td>
+                <button class="btn btn-danger btn-sm">Удалить</button>
+            </td>
+        </tr>
+
+        {{end}}
 
         <tr>
             <td>{{.MAC}}</td>

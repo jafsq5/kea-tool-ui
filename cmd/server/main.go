@@ -31,7 +31,18 @@ func main() {
 
     mux.Handle("/static/", web.Static())
 
-    mux.HandleFunc("/", handler.Index())
+    repo := hosts.New(cfg.Kea.HostsFile)
+
+    reloader := kea.New(cfg.Kea.ControlAgent)
+
+    svc := hosts.NewService(
+        repo,
+        reloader,
+    )
+
+    h := handler.New(svc)
+
+    mux.HandleFunc("/", h.Index)
 
     logger.Info("starting server",
         "listen", cfg.Server.Listen,

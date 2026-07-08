@@ -1,1 +1,9 @@
-{ "server": { "listen": ":8080" }, "kea": { "url": "http://127.0.0.1:8000" } }
+{
+  "server": { "listen": ":8080" },
+
+  "kea":
+    {
+      "control-agent": "http://10.15.16.134:8000/",
+      "hosts-file": "/etc/kea/kea-dhcp4.hosts",
+    },
+}
