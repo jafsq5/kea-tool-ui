@@ -1,3 +1,5 @@
+package kea
+
 type Reservation struct {
 	HWAddress string `json:"hw-address"`
 	Hostname  string `json:"hostname"`
