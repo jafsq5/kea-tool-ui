@@ -1,18 +1,16 @@
 package hosts
 
-
-
 type Service struct {
-    repo     *Repository
-    reloader Reloader
+	repo     Repository
+	reloader Reloader
 }
 
-func NewService(repo *Repository, r Reloader) *Service {
+func NewService(repo Repository, reloader Reloader) *Service {
 
-    return &Service{
-        repo: repo,
-        reloader: r,
-    }
+	return &Service{
+		repo:     repo,
+		reloader: reloader,
+	}
 }
 
 func (s *Service) List() ([]Host, error) {

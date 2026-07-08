@@ -24,16 +24,13 @@ func ReadFile(path string) ([]Host, error) {
 	var hosts []Host
 
 	err = json.Unmarshal([]byte(text), &hosts)
-	if err != nil {
-		return nil, err
-	}
 
-	return hosts, nil
+	return hosts, err
 }
 
 func WriteFile(path string, hosts []Host) error {
 
-	lines := make([]string, 0, len(hosts))
+	out := make([]string, 0, len(hosts))
 
 	for _, h := range hosts {
 
@@ -42,10 +39,12 @@ func WriteFile(path string, hosts []Host) error {
 			return err
 		}
 
-		lines = append(lines, string(b))
+		out = append(out, string(b))
 	}
 
-	text := strings.Join(lines, ",\n")
-
-	return os.WriteFile(path, []byte(text), 0644)
+	return os.WriteFile(
+		path,
+		[]byte(strings.Join(out, ",\n")),
+		0644,
+	)
 }

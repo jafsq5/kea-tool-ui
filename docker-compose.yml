@@ -2,7 +2,7 @@ services:
   kea-ui:
     build: .
     environment:
-      CONFIG_FILE: /configs/config.json
+      CONFIG_FILE: /config/config.json
 
     volumes:
       - ./configs/config.json:/config/config.json:ro

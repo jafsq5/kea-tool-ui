@@ -4,9 +4,12 @@ import (
     "log/slog"
     "net/http"
     "os"
+
     "github.com/jafsq5/kea-tool-ui/internal/config"
-    "github.com/jafsq5/kea-tool-ui/internal/handler"
-    "github.com/jafsq5/kea-tool-ui/internal/web"
+	"github.com/jafsq5/kea-tool-ui/internal/handler"
+	"github.com/jafsq5/kea-tool-ui/internal/hosts"
+	"github.com/jafsq5/kea-tool-ui/internal/kea"
+	"github.com/jafsq5/kea-tool-ui/internal/web"
 )
 
 func main() {
@@ -31,7 +34,7 @@ func main() {
 
     mux.Handle("/static/", web.Static())
 
-    repo := hosts.New(cfg.Kea.HostsFile)
+    repo := hosts.NewFileRepository(cfg.Kea.HostsFile)
 
     reloader := kea.New(cfg.Kea.ControlAgent)
 

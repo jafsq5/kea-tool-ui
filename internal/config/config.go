@@ -6,13 +6,17 @@ import (
 )
 
 type Config struct {
-    Server ServerConfig `json:"server"`
-    Kea    KeaConfig    `json:"kea"`
+	Server ServerConfig `json:"server"`
+	Kea    KeaConfig    `json:"kea"`
+}
+
+type ServerConfig struct {
+	Listen string `json:"listen"`
 }
 
 type KeaConfig struct {
-    ControlAgent string `json:"control-agent"`
-    HostsFile    string `json:"hosts-file"`
+	ControlAgent string `json:"control-agent"`
+	HostsFile    string `json:"hosts-file"`
 }
 
 func Load(path string) (*Config, error) {

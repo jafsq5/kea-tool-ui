@@ -5,32 +5,28 @@ import (
 	"strings"
 )
 
-type Repository interface {
-    List() ([]Host, error)
-    Add(Host) error
-    Delete(string) error
-    Exists(string) (bool, error)
+type FileRepository struct {
+	Path string
 }
 
-func New(path string) *Repository {
-	return &Repository{
+func NewFileRepository(path string) *FileRepository {
+	return &FileRepository{
 		Path: path,
 	}
 }
 
-func (r *Repository) List() ([]Host, error) {
+func (r *FileRepository) List() ([]Host, error) {
 	return ReadFile(r.Path)
 }
 
-func (r *Repository) Exists(mac string) (bool, error) {
+func (r *FileRepository) Exists(mac string) (bool, error) {
 
-	hosts, err := r.List()
+	list, err := r.List()
 	if err != nil {
 		return false, err
 	}
 
-	for _, h := range hosts {
-
+	for _, h := range list {
 		if strings.EqualFold(h.HWAddress, mac) {
 			return true, nil
 		}
@@ -39,37 +35,38 @@ func (r *Repository) Exists(mac string) (bool, error) {
 	return false, nil
 }
 
-func (r *Repository) Add(host Host) error {
+func (r *FileRepository) Add(host Host) error {
 
-	hosts, err := r.List()
+	list, err := r.List()
 	if err != nil {
 		return err
 	}
 
-	for _, h := range hosts {
-
+	for _, h := range list {
 		if strings.EqualFold(h.HWAddress, host.HWAddress) {
 			return errors.New("MAC already exists")
 		}
 	}
 
-	host.ClientClasses = []string{"reserved_class"}
+	if len(host.ClientClasses) == 0 {
+		host.ClientClasses = []string{"reserved_class"}
+	}
 
-	hosts = append(hosts, host)
+	list = append(list, host)
 
-	return WriteFile(r.Path, hosts)
+	return WriteFile(r.Path, list)
 }
 
-func (r *Repository) Delete(mac string) error {
+func (r *FileRepository) Delete(mac string) error {
 
-	hosts, err := r.List()
+	list, err := r.List()
 	if err != nil {
 		return err
 	}
 
-	out := make([]Host, 0, len(hosts))
+	out := make([]Host, 0, len(list))
 
-	for _, h := range hosts {
+	for _, h := range list {
 
 		if strings.EqualFold(h.HWAddress, mac) {
 			continue
