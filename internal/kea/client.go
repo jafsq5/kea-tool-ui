@@ -36,7 +36,6 @@ func (c *Client) Call(ctx context.Context, req any, resp any) error {
 		c.url,
 		bytes.NewReader(body),
 	)
-
 	if err != nil {
 		return err
 	}
@@ -51,6 +50,10 @@ func (c *Client) Call(ctx context.Context, req any, resp any) error {
 
 	if httpResp.StatusCode != http.StatusOK {
 		return fmt.Errorf("kea returned %s", httpResp.Status)
+	}
+
+	if resp == nil {
+		return nil
 	}
 
 	return json.NewDecoder(httpResp.Body).Decode(resp)

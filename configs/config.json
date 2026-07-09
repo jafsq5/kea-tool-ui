@@ -1,9 +1,19 @@
 {
-  "server": { "listen": ":8080" },
+  "server": {
+    "listen": ":8080"
+  },
 
-  "kea":
-    {
-      "control-agent": "http://10.15.16.134:8000/",
-      "hosts-file": "/etc/kea/kea-dhcp4.hosts",
-    },
+  "kea": {
+    "control-agent": "http://10.15.16.134:8000/",
+    "hosts-file": "/etc/kea/kea-dhcp4.hosts"
+  },
+
+  "ssh": {
+    "host": "10.15.16.134",
+    "port": 22,
+    "user": "kea-ui",
+    "password": "",
+    "private-key-file": "/configs/id_ed25519",
+    "timeout": 10
+  }
 }

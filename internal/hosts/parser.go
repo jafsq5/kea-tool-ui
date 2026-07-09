@@ -2,19 +2,14 @@ package hosts
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"strings"
 )
 
-func ReadFile(path string) ([]Host, error) {
-
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
+func Parse(data []byte) ([]Host, error) {
 
 	text := strings.TrimSpace(string(data))
-
 	if text == "" {
 		return []Host{}, nil
 	}
@@ -23,12 +18,14 @@ func ReadFile(path string) ([]Host, error) {
 
 	var hosts []Host
 
-	err = json.Unmarshal([]byte(text), &hosts)
+	if err := json.Unmarshal([]byte(text), &hosts); err != nil {
+		return nil, err
+	}
 
-	return hosts, err
+	return hosts, nil
 }
 
-func WriteFile(path string, hosts []Host) error {
+func Marshal(hosts []Host) ([]byte, error) {
 
 	out := make([]string, 0, len(hosts))
 
@@ -36,15 +33,36 @@ func WriteFile(path string, hosts []Host) error {
 
 		b, err := json.Marshal(h)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		out = append(out, string(b))
 	}
 
-	return os.WriteFile(
-		path,
-		[]byte(strings.Join(out, ",\n")),
-		0644,
-	)
+	return []byte(strings.Join(out, ",\n")), nil
+}
+
+func ReadFile(path string) ([]Host, error) {
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+
+		if errors.Is(err, os.ErrNotExist) {
+			return []Host{}, nil
+		}
+
+		return nil, err
+	}
+
+	return Parse(data)
+}
+
+func WriteFile(path string, hosts []Host) error {
+
+	data, err := Marshal(hosts)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(path, data, 0644)
 }
