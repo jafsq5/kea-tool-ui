@@ -3,16 +3,20 @@ package hosts
 import (
 	"errors"
 	"strings"
+
+	sshclient "github.com/jafsq5/kea-tool-ui/internal/ssh"
 )
 
 type FileRepository struct {
-	Path string
+    Client *sshclient.Client
+    Path   string
 }
 
-func NewFileRepository(path string) *FileRepository {
-	return &FileRepository{
-		Path: path,
-	}
+func NewFileRepository(client *sshclient.Client, path string) *FileRepository {
+    return &FileRepository{
+        Client: client,
+        Path:   path,
+    }
 }
 
 func (r *FileRepository) List() ([]Host, error) {

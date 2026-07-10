@@ -1,3 +1,3 @@
 module github.com/jafsq5/kea-tool-ui
 
-go 1.24
+go 1.25

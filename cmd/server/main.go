@@ -1,61 +1,79 @@
 package main
 
 import (
-    "log/slog"
-    "net/http"
-    "os"
+	"log/slog"
+	"net/http"
+	"os"
 
-    "github.com/jafsq5/kea-tool-ui/internal/config"
+	"github.com/jafsq5/kea-tool-ui/internal/config"
 	"github.com/jafsq5/kea-tool-ui/internal/handler"
 	"github.com/jafsq5/kea-tool-ui/internal/hosts"
 	"github.com/jafsq5/kea-tool-ui/internal/kea"
+	sshclient "github.com/jafsq5/kea-tool-ui/internal/ssh"
 	"github.com/jafsq5/kea-tool-ui/internal/web"
 )
 
 func main() {
 
-    logger := slog.New(
-        slog.NewJSONHandler(os.Stdout, nil),
-    )
+	logger := slog.New(
+		slog.NewJSONHandler(os.Stdout, nil),
+	)
 
-    //Add support env CONFIG_FILE
-    configPath := os.Getenv("CONFIG_FILE")
-    if configPath == "" {
-        configPath = "configs/config.json"
-    }
+	// Add support env CONFIG_FILE
+	configPath := os.Getenv("CONFIG_FILE")
+	if configPath == "" {
+		configPath = "configs/config.json"
+	}
 
-    cfg, err := config.Load(configPath)
-    if err != nil {
-        logger.Error("cannot load config", "error", err)
-        os.Exit(1)
-    }
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		logger.Error("cannot load config", "error", err)
+		os.Exit(1)
+	}
 
-    mux := http.NewServeMux()
+	sshClient, err := sshclient.New(
+		cfg.SSH.Host,
+		cfg.SSH.Port,
+		cfg.SSH.User,
+		cfg.SSH.PrivateKey,
+		cfg.SSH.Timeout,
+	)
+	if err != nil {
+		logger.Error("cannot create ssh client", "error", err)
+		os.Exit(1)
+	}
+	defer sshClient.Close()
 
-    mux.Handle("/static/", web.Static())
+	mux := http.NewServeMux()
 
-    repo := hosts.NewFileRepository(cfg.Kea.HostsFile)
+	mux.Handle("/static/", web.Static())
 
-    reloader := kea.New(cfg.Kea.ControlAgent)
+	repo := hosts.NewFileRepository(
+		sshClient,
+		cfg.Kea.HostsFile,
+	)
 
-    svc := hosts.NewService(
-        repo,
-        reloader,
-    )
+	reloader := kea.New(cfg.Kea.ControlAgent)
 
-    h := handler.New(svc)
+	svc := hosts.NewService(
+		repo,
+		reloader,
+	)
 
-    mux.HandleFunc("/", h.Index)
+	h := handler.New(svc)
 
-    logger.Info("starting server",
-        "listen", cfg.Server.Listen,
-    )
+	mux.HandleFunc("/", h.Index)
 
-    err = http.ListenAndServe(cfg.Server.Listen, mux)
-    if err != nil {
-        logger.Error(err.Error())
-        os.Exit(1)
-    }
+	logger.Info(
+		"starting server",
+		"listen", cfg.Server.Listen,
+	)
+
+	err = http.ListenAndServe(cfg.Server.Listen, mux)
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
 }
 
 func logging(log *slog.Logger, next http.Handler) http.Handler {

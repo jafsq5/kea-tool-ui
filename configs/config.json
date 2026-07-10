@@ -4,15 +4,15 @@
   },
 
   "kea": {
-    "control-agent": "http://10.15.16.134:8000/",
+    "control-agent": "http://10.1.2.3:8000/",
     "hosts-file": "/etc/kea/kea-dhcp4.hosts"
   },
 
   "ssh": {
-    "host": "10.15.16.134",
+    "host": "10.1.2.3",
     "port": 22,
     "user": "kea-ui",
-    "password": "",
+    "password": "password_kea-ui",
     "private-key-file": "/configs/id_ed25519",
     "timeout": 10
   }
